@@ -1,4 +1,5 @@
 import fs from "fs";
+import { parse } from "path";
 import { v4 as getUuid } from "uuid";
 
 import type { User } from "./types/user";
@@ -12,13 +13,15 @@ export const DEFAULT_USERS_STORE: UsersStore = {
 };
 
 export default class HelloModel {
-  constructor(private usersFilePath: string) {}
+  constructor(private usersFilePath: string) { }
 
   private async getUsersStore() {
     const usersStoreExists = fs.existsSync(this.usersFilePath);
 
     if (!usersStoreExists) {
       const store = DEFAULT_USERS_STORE;
+
+      await fs.promises.mkdir(parse(this.usersFilePath).dir, { recursive: true });
 
       await fs.promises.writeFile(this.usersFilePath, JSON.stringify(store));
 
